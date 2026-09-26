@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="To-Do List: список задач с поиском, редактированием и тёмной темой">
+  <title>To-Do List</title>
+  <script>
+    (function () {
+      var theme = null;
+      try {
+        theme = localStorage.getItem('theme');
+      } catch (e) { }
+      if (theme !== 'dark' && theme !== 'light') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="dist/css/main.css">
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <h1 class="header__title">Задачи</h1>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false" title="Тёмная тема">
+        <svg class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" />
+        </svg>
+        <span class="visually-hidden">Тёмная тема</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="toolbar">
+        <div class="search toolbar__search">
+          <label for="search" class="visually-hidden">Поиск задач</label>
+          <svg class="search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M20 20l-3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <input id="search" class="search__input" type="search" placeholder="Найти задачу..." autocomplete="off"
+            data-search>
+        </div>
+        <button type="button" class="button button--primary toolbar__add" data-add-task>Добавить задачу</button>
+      </div>
+
+      <section class="tasks" aria-labelledby="tasks-title">
+        <h2 class="tasks__title" id="tasks-title">Мои задачи</h2>
+        <div class="tasks__card">
+          <ul class="task-list" aria-labelledby="tasks-title" data-task-list></ul>
+          <div class="empty-state" data-empty hidden>
+            <p class="empty-state__title" data-empty-title></p>
+            <p class="empty-state__text" data-empty-text></p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-live></div>
+
+  <dialog class="modal" aria-labelledby="task-dialog-title" data-task-dialog>
+    <form class="modal__form" novalidate data-task-form>
+      <h2 class="modal__title" id="task-dialog-title" data-dialog-title>Новая задача</h2>
+      <div class="field">
+        <label class="field__label" for="task-title">Название</label>
+        <input class="field__input" id="task-title" name="title" type="text" maxlength="200" required autofocus
+          autocomplete="off" placeholder="Например, купить молоко" data-title-input>
+        <p class="field__error" id="task-title-error" role="alert" hidden data-title-error></p>
+      </div>
+      <div class="modal__actions">
+        <button type="button" class="button button--ghost" data-cancel>Отмена</button>
+        <button type="submit" class="button button--primary">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template data-task-template>
+    <li class="task" data-task data-done="false">
+      <span class="task__check">
+        <input class="task__input js-task-check" type="checkbox">
+        <span class="task__box" aria-hidden="true">
+          <svg class="task__mark" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </span>
+      <label class="task__title js-task-title"></label>
+      <div class="task__actions">
+        <button type="button" class="button button--icon js-task-edit">
+          <span class="visually-hidden">Редактировать задачу</span>
+          <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z M13.5 6.5l4 4" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button type="button" class="button button--icon button--danger js-task-delete">
+          <span class="visually-hidden">Удалить задачу</span>
+          <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </li>
+  </template>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>

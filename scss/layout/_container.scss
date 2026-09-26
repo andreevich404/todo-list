@@ -1,0 +1,12 @@
+@use '../utils' as *;
+
+.container {
+  width: 100%;
+  max-width: $container-width + $container-padding * 2;
+  margin-inline: auto;
+  padding-inline: $container-padding;
+
+  @include respond-to(tablet) {
+    padding-inline: rem(24px);
+  }
+}
