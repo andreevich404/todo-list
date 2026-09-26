@@ -1,0 +1,18 @@
+@use 'light' as *;
+@use 'dark' as *;
+
+:root {
+  color-scheme: light;
+
+  @each $name, $value in $theme-light {
+    --color-#{$name}: #{$value};
+  }
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  @each $name, $value in $theme-dark {
+    --color-#{$name}: #{$value};
+  }
+}

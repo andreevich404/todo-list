@@ -1,0 +1,23 @@
+@use '../utils' as *;
+
+.tasks {
+  &__title {
+    margin-bottom: rem(12px);
+    padding-inline: rem(4px);
+    font-size: $fs-heading;
+    font-weight: 600;
+  }
+
+  &__card {
+    overflow: hidden;
+    border: 1px solid var(--color-border-soft);
+    border-radius: $radius-lg;
+    background: var(--color-surface);
+    box-shadow: var(--color-shadow-card);
+  }
+}
+
+.task-list {
+  margin: 0;
+  padding: 0;
+}
