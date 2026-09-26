@@ -1,0 +1,17 @@
+{
+  "name": "todo-list",
+  "version": "1.0.0",
+  "description": "To-Do List на Tailwind CSS и vanilla JS с упором на доступность (лабораторная работа №4)",
+  "scripts": {
+    "tailwind:dev": "tailwindcss -i ./src/input.css -o ./dist/css/main.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./dist/css/main.css --minify"
+  },
+  "author": "Толкачев Иван Андреевич",
+  "license": "ISC",
+  "type": "commonjs",
+  "private": true,
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
