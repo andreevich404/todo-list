@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru" class="scheme-light dark:scheme-dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="To-Do List: список задач с поиском, редактированием и тёмной темой">
+  <title>To-Do List</title>
+  <script>
+    (function () {
+      var theme = null;
+      try {
+        theme = localStorage.getItem('theme');
+      } catch (e) { }
+      if (theme !== 'dark' && theme !== 'light') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="dist/css/main.css">
+</head>
+
+<body
+  class="min-h-screen bg-[#f5f5f7] font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Text','Segoe_UI',Roboto,Helvetica,Arial,sans-serif] text-base leading-normal text-[#1d1d1f] antialiased dark:bg-black dark:text-[#f5f5f7]">
+  <header class="pt-5 pb-2 md:pt-10 md:pb-4">
+    <div class="mx-auto flex w-full max-w-[672px] items-center justify-between gap-4 px-4 md:px-6">
+      <h1 class="text-[1.875rem] font-bold leading-[1.15] tracking-[-0.02em] md:text-4xl md:leading-[1.15]">Задачи</h1>
+      <button type="button" data-theme-toggle aria-pressed="false" title="Тёмная тема"
+        class="inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#86868b] bg-white p-0 text-[#1d1d1f] transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 dark:border-[#8e8e93] dark:bg-[#f5f5f7] dark:text-black dark:focus-visible:outline-[#0a84ff]">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="block size-5">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" />
+        </svg>
+        <span class="sr-only">Тёмная тема</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="pt-2 pb-12 md:pt-4 md:pb-20">
+    <div class="mx-auto w-full max-w-[672px] px-4 md:px-6">
+      <div class="mb-7 flex flex-col gap-3 min-[480px]:flex-row min-[480px]:items-stretch">
+        <div class="relative min-w-0 flex-1">
+          <label for="search" class="sr-only">Поиск задач</label>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+            class="pointer-events-none absolute top-1/2 left-4 block size-[18px] -translate-y-1/2 text-[#636366] dark:text-[#a1a1a6]">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
+            <path d="M20 20l-3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <input id="search" type="search" placeholder="Найти задачу..." autocomplete="off" data-search
+            class="min-h-12 w-full appearance-none rounded-full border border-[#86868b] bg-white py-2.5 pr-4 pl-11 text-base text-[#1d1d1f] placeholder:text-[#636366] placeholder:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] dark:border-[#8e8e93] dark:bg-[#2c2c2e] dark:text-[#f5f5f7] dark:placeholder:text-[#a1a1a6] dark:focus-visible:outline-[#0a84ff]">
+        </div>
+        <button type="button" data-add-task
+          class="inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#0066cc] bg-[#0066cc] px-[22px] py-2.5 text-base leading-[1.2] font-medium text-white transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-[#0057ad] hover:bg-[#0057ad] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 dark:border-[#0a84ff] dark:bg-[#0a84ff] dark:text-black dark:hover:border-[#409cff] dark:hover:bg-[#409cff] dark:focus-visible:outline-[#0a84ff]">Добавить
+          задачу</button>
+      </div>
+
+      <section aria-labelledby="tasks-title">
+        <h2 id="tasks-title" class="mb-3 px-1 text-lg leading-[1.15] font-semibold tracking-[-0.02em]">Мои задачи</h2>
+        <div
+          class="overflow-hidden rounded-[18px] border border-black/8 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.05)] dark:border-white/10 dark:bg-[#1c1c1e] dark:shadow-[0_2px_12px_rgba(0,0,0,0.5)]">
+          <ul aria-labelledby="tasks-title" data-task-list></ul>
+          <div data-empty hidden class="px-6 py-12 text-center">
+            <p data-empty-title class="mb-1 text-lg font-semibold"></p>
+            <p data-empty-text class="text-[#636366] dark:text-[#a1a1a6]"></p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-live></div>
+
+  <dialog aria-labelledby="task-dialog-title" data-task-dialog
+    class="m-auto w-[min(calc(100%-32px),440px)] rounded-[18px] border-0 bg-white p-0 text-[#1d1d1f] shadow-[0_24px_64px_rgba(0,0,0,0.2)] transition-[opacity,scale] duration-[220ms] ease-[cubic-bezier(0.23,1,0.32,1)] backdrop:bg-black/40 starting:open:scale-[0.98] starting:open:opacity-0 motion-reduce:transition-none dark:bg-[#1c1c1e] dark:text-[#f5f5f7] dark:shadow-[0_24px_64px_rgba(0,0,0,0.7)] dark:backdrop:bg-black/65">
+    <form novalidate data-task-form class="flex flex-col gap-5 p-6">
+      <h2 id="task-dialog-title" data-dialog-title class="text-[1.375rem] font-bold leading-[1.15] tracking-[-0.02em]">Новая задача</h2>
+      <div class="flex flex-col gap-2">
+        <label for="task-title" class="text-sm font-semibold">Название</label>
+        <input id="task-title" name="title" type="text" maxlength="200" required autofocus autocomplete="off"
+          placeholder="Например, купить молоко" data-title-input
+          class="min-h-12 w-full rounded-xl border border-[#86868b] bg-white px-3.5 py-2.5 text-base text-[#1d1d1f] placeholder:text-[#636366] placeholder:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] aria-invalid:border-[#c1001b] dark:border-[#8e8e93] dark:bg-[#2c2c2e] dark:text-[#f5f5f7] dark:placeholder:text-[#a1a1a6] dark:focus-visible:outline-[#0a84ff] dark:aria-invalid:border-[#ff6961]">
+        <p id="task-title-error" role="alert" hidden data-title-error class="text-sm text-[#c1001b] dark:text-[#ff6961]"></p>
+      </div>
+      <div class="flex flex-col-reverse gap-2.5 min-[480px]:flex-row min-[480px]:justify-end">
+        <button type="button" data-cancel
+          class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#86868b] bg-transparent px-[22px] py-2.5 text-base leading-[1.2] font-medium text-[#1d1d1f] transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-black/6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 dark:border-[#8e8e93] dark:text-[#f5f5f7] dark:hover:bg-white/10 dark:focus-visible:outline-[#0a84ff]">Отмена</button>
+        <button type="submit"
+          class="inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#0066cc] bg-[#0066cc] px-[22px] py-2.5 text-base leading-[1.2] font-medium text-white transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-[#0057ad] hover:bg-[#0057ad] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 dark:border-[#0a84ff] dark:bg-[#0a84ff] dark:text-black dark:hover:border-[#409cff] dark:hover:bg-[#409cff] dark:focus-visible:outline-[#0a84ff]">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template data-task-template>
+    <li data-task data-done="false"
+      class="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-1 border-black/8 px-2 py-1 not-first:border-t dark:border-white/10">
+      <span class="group/check relative grid size-11 place-items-center">
+        <input type="checkbox" class="js-task-check absolute inset-0 m-0 size-full cursor-pointer opacity-0">
+        <span aria-hidden="true"
+          class="pointer-events-none flex size-6 items-center justify-center rounded-lg border-2 border-[#86868b] bg-white text-white transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/check:border-[#0066cc] group-has-[:checked]/check:border-[#0066cc] group-has-[:checked]/check:bg-[#0066cc] group-has-[:focus-visible]/check:outline-2 group-has-[:focus-visible]/check:outline-offset-2 group-has-[:focus-visible]/check:outline-[#0066cc] motion-reduce:transition-none dark:border-[#8e8e93] dark:bg-[#2c2c2e] dark:text-black dark:group-hover/check:border-[#0a84ff] dark:group-has-[:checked]/check:border-[#0a84ff] dark:group-has-[:checked]/check:bg-[#0a84ff] dark:group-has-[:focus-visible]/check:outline-[#0a84ff]">
+          <svg viewBox="0 0 16 16" focusable="false"
+            class="block size-3.5 opacity-0 transition-opacity duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-has-[:checked]/check:opacity-100 motion-reduce:transition-none">
+            <path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </span>
+      <label
+        class="js-task-title flex min-h-11 cursor-pointer items-center p-2 text-[1.0625rem] leading-[1.35] [overflow-wrap:anywhere] transition-colors duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-data-[done=true]:text-[#636366] group-data-[done=true]:line-through group-data-[done=true]:decoration-[1.5px] motion-reduce:transition-none dark:group-data-[done=true]:text-[#a1a1a6]"></label>
+      <div class="flex items-center gap-0.5">
+        <button type="button"
+          class="js-task-edit inline-flex size-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-transparent bg-transparent p-0 text-[#636366] transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-black/6 hover:text-[#1d1d1f] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 dark:text-[#a1a1a6] dark:hover:bg-white/10 dark:hover:text-[#f5f5f7] dark:focus-visible:outline-[#0a84ff]">
+          <span class="sr-only">Редактировать задачу</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="block size-5 shrink-0">
+            <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z M13.5 6.5l4 4" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button type="button"
+          class="js-task-delete inline-flex size-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-transparent bg-transparent p-0 text-[#636366] transition duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-black/6 hover:text-[#c1001b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0066cc] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 dark:text-[#a1a1a6] dark:hover:bg-white/10 dark:hover:text-[#ff6961] dark:focus-visible:outline-[#0a84ff]">
+          <span class="sr-only">Удалить задачу</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="block size-5 shrink-0">
+            <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </li>
+  </template>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>
