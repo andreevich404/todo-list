@@ -1,0 +1,9 @@
+@use '../utils' as *;
+
+.main {
+  padding-block: rem(8px) rem(48px);
+
+  @include respond-to(tablet) {
+    padding-block: rem(16px) rem(80px);
+  }
+}

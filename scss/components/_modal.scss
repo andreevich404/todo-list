@@ -1,0 +1,54 @@
+@use '../utils' as *;
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.modal {
+  width: min(calc(100% - #{$container-padding * 2}), 440px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: $radius-lg;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--color-shadow-modal);
+
+  &[open] {
+    animation: modal-in $transition-modal;
+  }
+
+  &::backdrop {
+    background: var(--color-overlay);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: rem(20px);
+    padding: rem(24px);
+  }
+
+  &__title {
+    font-size: $fs-modal-title;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: rem(10px);
+
+    @include respond-to(mobile) {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+  }
+}

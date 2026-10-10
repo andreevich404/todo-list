@@ -1,0 +1,24 @@
+@use '../utils' as *;
+
+.header {
+  padding-block: rem(20px) rem(8px);
+
+  @include respond-to(tablet) {
+    padding-block: rem(40px) rem(16px);
+  }
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: rem(16px);
+  }
+
+  &__title {
+    font-size: $fs-title;
+
+    @include respond-to(tablet) {
+      font-size: $fs-title-lg;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+@use '../utils' as *;
+
+.empty-state {
+  padding: rem(48px) rem(24px);
+  text-align: center;
+
+  &__title {
+    margin-bottom: rem(4px);
+    font-size: $fs-heading;
+    font-weight: 600;
+  }
+
+  &__text {
+    color: var(--color-text-muted);
+  }
+}

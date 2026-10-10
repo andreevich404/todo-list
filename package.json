@@ -1,0 +1,25 @@
+{
+	"name": "todo-list",
+	"version": "1.0.0",
+	"description": "To-Do List на Vue 3, Vite и Sass с упором на доступность (лабораторная работа №6)",
+	"private": true,
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"test": "vitest run"
+	},
+	"author": "Tolkachev Ivan Andreevich",
+	"license": "ISC",
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^6.0.9",
+		"jsdom": "^30.1.2",
+		"sass": "^1.105.0",
+		"vite": "^8.3.4",
+		"vitest": "^5.0.3"
+	},
+	"dependencies": {
+		"vue": "^3.5.43"
+	},
+	"type": "module"
+}
