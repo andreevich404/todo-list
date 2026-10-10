@@ -1,65 +1,76 @@
 # todo-list
 
-Приложение To-Do List (лабораторная работа №4): список задач на Sass и vanilla JS с упором на доступность.
+Приложение To-Do List (лабораторная работа №6): перенос To-Do из лабораторной №4 (Sass) на **Vue 3 (Composition API) + Vite**.
+
+**Опубликованное приложение:** https://andreevich404.github.io/todo-list/
 
 ## Возможности
 
 - добавление, редактирование и удаление задач через нативное модальное окно `<dialog>`;
 - отметка выполнения: выполненные задачи зачёркиваются, получают галочку и уходят вниз списка;
 - поиск по названию с фильтрацией по мере ввода;
-- светлая и тёмная темы (CSS custom properties, выбор сохраняется, при первом визите учитывается `prefers-color-scheme`);
+- светлая и тёмная темы (выбор сохраняется, при первом визите учитывается `prefers-color-scheme`);
 - хранение в `localStorage` (`todo.tasks`); пустое или повреждённое хранилище не ломает запуск;
-- адаптивная вёрстка (mobile-first, брейкпоинты 480 / 768 / 1024), отключение анимаций при `prefers-reduced-motion`;
-- озвучивание действий через `aria-live` («Задача добавлена», «Найдено задач: N»).
+- адаптивная вёрстка, отключение анимаций при `prefers-reduced-motion`, озвучивание действий через `aria-live`.
 
 ## Установка и запуск
 
 ```bash
-npm install
+npm ci            # установка зависимостей по package-lock.json
+npm run dev       # сервер разработки Vite
+npm run build     # сборка в dist/
+npm run preview   # локальный просмотр сборки
+npm test          # unit-тесты чтения/записи localStorage (Vitest)
 ```
-
-Сборка стилей (результат в `dist/css/main.css`):
-
-```bash
-npm run build
-```
-
-Разработка (два процесса в разных терминалах):
-
-```bash
-npm run sass:dev
-npx serve .
-```
-
-Страницу нужно открывать через локальный сервер, а не как файл.
 
 ## Структура
 
 ```
-scss/
-├─ utils/        переменные, функции, миксины (respond-to, focus-ring, visually-hidden)
-├─ base/         reset, типографика, базовые элементы, prefers-reduced-motion
-├─ layout/       container, header, main, toolbar
-├─ components/   button, theme-toggle, search, tasks, task, empty-state, field, modal
-├─ themes/       палитры light/dark и генерация CSS-переменных
-└─ main.scss
-js/main.js
-index.html
+src/
+├─ components/
+│  ├─ TodoList.vue      список + пустое состояние
+│  ├─ TodoItem.vue      одна задача (чекбокс, правка, удаление)
+│  ├─ AddTodoModal.vue  модальное окно с формой (создание и правка)
+│  ├─ SearchBar.vue     поле поиска
+│  └─ ThemeToggle.vue   переключатель темы
+├─ utils/storage.js     безопасное чтение/запись localStorage (+ тесты)
+├─ App.vue              состояние, computed, watch, управление фокусом
+└─ main.js
+scss/                   стили лабораторной №4 (Sass) без изменений
+index.html, vite.config.js
 ```
+
+## Как устроены компоненты
+
+Всё состояние (`tasks`, `query`, `dark`, состояние модалки) хранится в `App.vue` на `ref`. Дочерние компоненты получают данные через `props` и возвращают действия через `emit`: `TodoItem` → `toggle` / `edit` / `delete`, `SearchBar` → `update:modelValue` (`v-model`), `AddTodoModal` → `save` / `close`, `ThemeToggle` → `toggle`. Логика не дублируется: фильтрация и сортировка — только в родителе.
+
+`computed`: `orderedTasks` (невыполненные сверху), `visibleTasks` (после поиска), `editingTask`.
+
+### Где применены `watch`
+
+- `watch(tasks, saveTasks, { deep: true })` — любое изменение списка (добавление, правка названия, чекбокс, удаление) автоматически сохраняется в `localStorage`; не нужно вызывать сохранение в каждом обработчике.
+- `watch(dark, …)` — смена темы ставит/снимает `data-theme` на `<html>` и запоминает выбор.
+- `watch(query, …)` — с задержкой 700 мс озвучивает число найденных задач в `aria-live`-области, чтобы скринридер не читал результат на каждую букву.
+- `watch(() => props.open, …)` в `AddTodoModal` — синхронизирует флаг `open` с нативным `<dialog>` (`showModal()` / `close()`).
+
+### Где применён `v-if`
+
+- `TodoList`: `<ul v-if="tasks.length">` / `<div v-else>` — вместо списка показывается пустое состояние, а `v-if="total === 0"` выбирает текст «Задач пока нет» или «Ничего не найдено».
+- `AddTodoModal`: сообщение об ошибке валидации `<p v-if="error" role="alert">` появляется только при пустом названии.
+
+Само модальное окно намеренно оставлено нативным `<dialog>` без `v-if`: так сохраняются ловушка фокуса, закрытие по Esc и поведение с клавиатуры.
 
 ## Доступность
 
 - нативные `<button>`, `<input>`, `<dialog>`, `<label>`; порядок Tab совпадает с порядком в DOM, `tabindex` не используется;
-- кнопки-иконки называются вместе с задачей через `aria-labelledby`: «Удалить задачу Купить молоко»; имя обновляется при переименовании;
+- кнопки-иконки называются вместе с задачей через `aria-labelledby`: «Удалить задачу Купить молоко»;
 - в модальном окне фокус попадает в поле названия, Esc закрывает окно, при закрытии фокус возвращается на кнопку-инициатор;
-- после удаления фокус переходит на ближайшую видимую задачу (с учётом поиска) или на кнопку «Добавить задачу»;
-- видимый `:focus-visible` у всех интерактивных элементов, контраст текста не ниже 4.5:1 в обеих темах.
+- после удаления фокус переходит на ближайшую видимую задачу или на кнопку «Добавить задачу»; после переключения чекбокса фокус остаётся на нём;
+- видимый `:focus-visible`, контраст текста не ниже 4.5:1 в обеих темах.
 
-Как проверять:
+## Публикация
 
-1. Пройти все сценарии только клавиатурой (Tab, Shift+Tab, Enter, Space, Esc).
-2. Chrome DevTools -> Lighthouse -> Mode: Snapshot, Categories: Accessibility (Desktop и Mobile, обе темы; снять галочку Clear storage).
-3. DevTools -> Elements -> Accessibility -> Computed Properties -> Name для кнопок задач.
+Хостинг — **GitHub Pages**. Workflow `.github/workflows/ci.yaml` при пуше в ветку `lab-6` (или вручную) выполняет `npm ci`, `npm test`, `npm run build` и публикует содержимое `dist/` через `actions/deploy-pages`. В `vite.config.js` задан `base: './'`, поэтому сборка работает по адресу вида `https://<пользователь>.github.io/todo-list/`. В настройках репозитория: **Settings → Pages → Source: GitHub Actions**. После слияния PR ветку в workflow нужно заменить на `main`.
 
 ## Автор
 
