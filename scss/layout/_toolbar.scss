@@ -1,0 +1,22 @@
+@use '../utils' as *;
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: rem(12px);
+  margin-bottom: rem(28px);
+
+  @include respond-to(mobile) {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  &__search {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__add {
+    flex-shrink: 0;
+  }
+}

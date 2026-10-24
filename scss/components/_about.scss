@@ -1,0 +1,105 @@
+@use '../utils' as *;
+
+.about {
+  margin-bottom: rem(28px);
+
+  &.card {
+    padding: rem(20px);
+  }
+
+  &__heading {
+    margin-bottom: rem(12px);
+    font-size: $fs-heading;
+    font-weight: 600;
+  }
+
+  &__hero p {
+    font-size: $fs-lead;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: rem(12px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include respond-to(mobile) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+    padding: rem(16px);
+  }
+
+  &__value {
+    color: var(--color-primary);
+    font-size: $fs-title;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__label {
+    color: var(--color-text-muted);
+    font-size: $fs-small;
+  }
+
+  &__timeline {
+    display: flex;
+    flex-direction: column;
+    gap: rem(16px);
+    margin: 0;
+    padding: 0 0 0 rem(20px);
+    list-style: none;
+    border-left: 2px solid var(--color-border);
+  }
+
+  &__step {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: rem(6px);
+      left: rem(-27px);
+      width: rem(12px);
+      height: rem(12px);
+      border-radius: 50%;
+      background: var(--color-primary);
+    }
+  }
+
+  &__tag {
+    font-weight: 600;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(8px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__chip {
+    padding: rem(6px) rem(14px);
+    border: 1px solid var(--color-border);
+    border-radius: $radius-pill;
+    background: var(--color-surface);
+    font-size: $fs-small;
+  }
+
+  &__note {
+    border-color: var(--color-border-strong);
+  }
+
+  code {
+    font-size: 0.9em;
+  }
+}

@@ -1,0 +1,68 @@
+@use '../utils' as *;
+
+.nav {
+  order: 3;
+  width: 100%;
+
+  @include respond-to(tablet) {
+    order: 0;
+    width: auto;
+    flex: 1;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: rem(4px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__link {
+    @include flex-center($inline: true);
+    min-height: rem($tap-size);
+    padding-inline: rem(14px);
+    border-radius: $radius-pill;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    text-decoration: none;
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--color-hover-bg);
+        color: var(--color-text);
+      }
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+
+    &.router-link-active {
+      background: var(--color-hover-bg);
+      color: var(--color-text);
+    }
+  }
+}
+
+.skip-link {
+  @include visually-hidden;
+
+  &:focus {
+    position: fixed;
+    top: rem(8px);
+    left: rem(8px);
+    z-index: 100;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: rem(10px) rem(16px);
+    overflow: visible;
+    clip-path: none;
+    border-radius: $radius-sm;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    @include focus-ring(3px);
+  }
+}

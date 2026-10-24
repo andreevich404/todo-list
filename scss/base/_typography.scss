@@ -1,0 +1,18 @@
+@use '../utils' as *;
+
+body {
+  min-height: 100vh;
+  font-family: $font-base;
+  font-size: $fs-base;
+  line-height: $line-height-base;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2 {
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}

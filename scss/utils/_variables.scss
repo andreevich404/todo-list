@@ -1,0 +1,35 @@
+$base-font-size: 16px;
+
+$breakpoints: (
+  mobile: 480px,
+  tablet: 768px,
+  desktop: 1024px,
+);
+
+$font-base:
+  -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto,
+  Helvetica, Arial, sans-serif;
+$line-height-base: 1.5;
+
+$fs-small: 0.875rem;
+$fs-base: 1rem;
+$fs-lead: 1.0625rem;
+$fs-heading: 1.125rem;
+$fs-modal-title: 1.375rem;
+$fs-title: 1.875rem;
+$fs-title-lg: 2.25rem;
+
+$container-width: 640px;
+$container-padding: 16px;
+$tap-size: 44px;
+
+$radius-lg: 18px;
+$radius-md: 14px;
+$radius-sm: 12px;
+$radius-check: 8px;
+$radius-pill: 999px;
+
+$ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+$transition-fast: 180ms $ease-out;
+$transition-press: 160ms $ease-out;
+$transition-modal: 220ms $ease-out;

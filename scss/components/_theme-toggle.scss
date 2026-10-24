@@ -1,0 +1,35 @@
+@use '../utils' as *;
+
+.theme-toggle {
+  @include flex-center($inline: true);
+  flex-shrink: 0;
+  width: rem($tap-size);
+  height: rem($tap-size);
+  padding: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    background $transition-fast,
+    transform $transition-press;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &[aria-pressed='true'] {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  &__icon {
+    width: rem(20px);
+    height: rem(20px);
+  }
+}

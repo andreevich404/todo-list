@@ -1,0 +1,71 @@
+@use '../utils' as *;
+
+.page-title {
+  margin-bottom: rem(16px);
+  font-size: $fs-title;
+
+  @include respond-to(tablet) {
+    font-size: $fs-title-lg;
+  }
+}
+
+.card {
+  border: 1px solid var(--color-border-soft);
+  border-radius: $radius-lg;
+  background: var(--color-surface);
+  box-shadow: var(--color-shadow-card);
+}
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  gap: rem(16px);
+  padding: rem(20px);
+
+  @include respond-to(tablet) {
+    padding: rem(28px);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: rem(16px);
+  }
+
+  &__hint {
+    color: var(--color-text-muted);
+    font-size: $fs-small;
+  }
+
+  a {
+    color: var(--color-primary);
+    font-weight: 500;
+
+    &:focus-visible {
+      @include focus-ring;
+      border-radius: 4px;
+    }
+  }
+}
+
+.field__hint {
+  color: var(--color-text-muted);
+  font-size: $fs-small;
+}
+
+.notice {
+  padding: rem(12px) rem(14px);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-sm;
+  font-size: $fs-small;
+
+  &--error {
+    border-color: var(--color-error);
+    color: var(--color-error);
+  }
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
