@@ -2,7 +2,7 @@ name: Build and publish To-Do
 
 on:
   push:
-    branches: [lab-6]
+    branches: [lab-6, lab-7]
   workflow_dispatch:
 
 permissions:
