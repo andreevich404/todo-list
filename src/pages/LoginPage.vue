@@ -25,8 +25,14 @@ async function submit() {
   if (submitting.value) return;
   submitting.value = true;
   error.value = '';
-  const result = await users.login({ email: email.value, password: password.value });
-  submitting.value = false;
+  let result;
+  try {
+    result = await users.login({ email: email.value, password: password.value });
+  } catch {
+    result = { ok: false, error: 'Не удалось выполнить вход. Попробуйте ещё раз.' };
+  } finally {
+    submitting.value = false;
+  }
   if (result.ok) {
     router.push(safeRedirect());
   } else {
@@ -55,7 +61,9 @@ async function submit() {
         <input id="login-password" v-model="password" class="field__input" type="password" name="password"
           autocomplete="current-password" required :aria-invalid="error ? 'true' : null">
       </div>
-      <button type="submit" class="button button--primary" :disabled="submitting">Войти</button>
+      <button type="submit" class="button button--primary" :disabled="submitting">
+        {{ submitting ? 'Проверяем…' : 'Войти' }}
+      </button>
     </form>
 
     <p class="auth__hint">Нет аккаунта? <RouterLink :to="{ name: 'register' }">Зарегистрироваться</RouterLink></p>

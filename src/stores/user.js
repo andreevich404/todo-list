@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { hashPassword, safeEqual, toHex } from '../utils/password.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD = 6;
@@ -6,29 +7,10 @@ const LOGIN_ERROR = 'Неверный email или пароль';
 
 const normalizeEmail = (email) => String(email ?? '').trim().toLowerCase();
 
-const toHex = (buffer) => [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, '0')).join('');
+const PBKDF2_ITERATIONS = 600_000;
 
 function randomHex(bytes = 16) {
   return toHex(crypto.getRandomValues(new Uint8Array(bytes)));
-}
-
-const PBKDF2_ITERATIONS = 600_000;
-
-const fromHex = (hex) => Uint8Array.from(hex.match(/../g) ?? [], (h) => parseInt(h, 16));
-
-// PBKDF2-SHA256
-async function hashPassword(password, salt, iterations) {
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: fromHex(salt), iterations }, key, 256);
-  return toHex(bits);
-}
-
-// сравнение без раннего выхода по первому несовпавшему символу
-function safeEqual(a, b) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
 }
 
 export const useUserStore = defineStore('user', {

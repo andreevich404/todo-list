@@ -8,6 +8,7 @@ const router = useRouter();
 
 const form = reactive({ email: '', password: '', confirm: '' });
 const errors = ref({});
+const formError = ref('');
 const submitting = ref(false);
 
 const fields = ['email', 'password', 'confirm'];
@@ -15,16 +16,24 @@ const fields = ['email', 'password', 'confirm'];
 async function submit() {
   if (submitting.value) return;
   submitting.value = true;
-  const result = await users.register({ ...form });
-  submitting.value = false;
+  formError.value = '';
+  let result;
+  try {
+    result = await users.register({ ...form });
+  } catch {
+    result = { ok: false, errors: {}, formError: 'Не удалось зарегистрироваться. Попробуйте ещё раз.' };
+  } finally {
+    submitting.value = false;
+  }
   if (result.ok) {
     router.push({ name: 'login', query: { registered: '1' } });
     return;
   }
   errors.value = result.errors;
+  formError.value = result.formError ?? '';
   // фокус на первое поле с ошибкой
   const first = fields.find((name) => result.errors[name]);
-  document.getElementById(`register-${first}`)?.focus();
+  if (first) document.getElementById(`register-${first}`)?.focus();
 }
 
 function clear(name) {
@@ -36,6 +45,8 @@ function clear(name) {
   <h1 class="page-title">Регистрация</h1>
 
   <div class="card auth">
+    <p v-if="formError" class="notice notice--error" role="alert">{{ formError }}</p>
+
     <form class="auth__form" novalidate @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="register-email">Email</label>
@@ -60,7 +71,9 @@ function clear(name) {
           :aria-describedby="errors.confirm ? 'register-confirm-error' : null" @input="clear('confirm')">
         <p v-if="errors.confirm" id="register-confirm-error" class="field__error" role="alert">{{ errors.confirm }}</p>
       </div>
-      <button type="submit" class="button button--primary" :disabled="submitting">Зарегистрироваться</button>
+      <button type="submit" class="button button--primary" :disabled="submitting">
+        {{ submitting ? 'Создаём аккаунт…' : 'Зарегистрироваться' }}
+      </button>
     </form>
 
     <p class="auth__hint">Уже есть аккаунт? <RouterLink :to="{ name: 'login' }">Войти</RouterLink></p>
