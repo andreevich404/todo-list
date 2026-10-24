@@ -78,3 +78,9 @@
   height: rem(20px);
   flex-shrink: 0;
 }
+
+.button--compact {
+  min-height: rem(36px);
+  padding: rem(6px) rem(14px);
+  font-size: $fs-small;
+}

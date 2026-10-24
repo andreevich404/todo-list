@@ -1,24 +1,48 @@
 @use '../utils' as *;
 
 .header {
-  padding-block: rem(20px) rem(8px);
+  padding-block: rem(16px) rem(8px);
 
   @include respond-to(tablet) {
-    padding-block: rem(40px) rem(16px);
+    padding-block: rem(28px) rem(12px);
   }
 
   &__inner {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: rem(16px);
+    gap: rem(8px) rem(16px);
   }
 
-  &__title {
-    font-size: $fs-title;
+  &__brand {
+    color: var(--color-text);
+    font-size: $fs-modal-title;
+    font-weight: 700;
+    text-decoration: none;
+
+    &:focus-visible {
+      @include focus-ring;
+      border-radius: 4px;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: rem(10px);
+  }
+
+  &__user {
+    max-width: 14ch;
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: $fs-small;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     @include respond-to(tablet) {
-      font-size: $fs-title-lg;
+      max-width: 24ch;
     }
   }
 }

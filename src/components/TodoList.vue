@@ -12,7 +12,7 @@ defineEmits(['toggle', 'edit', 'delete']);
 
 <template>
   <section class="tasks" aria-labelledby="tasks-title">
-    <h2 id="tasks-title" class="tasks__title">Мои задачи</h2>
+    <h2 id="tasks-title" class="tasks__title">Список</h2>
     <div class="tasks__card">
       <ul v-if="tasks.length" class="task-list" aria-labelledby="tasks-title">
         <TodoItem v-for="task in tasks" :key="task.id" :task="task" @toggle="$emit('toggle', $event)"

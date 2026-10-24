@@ -7,3 +7,7 @@
     padding-block: rem(16px) rem(80px);
   }
 }
+
+.main:focus {
+  outline: none;
+}

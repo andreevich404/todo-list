@@ -1,38 +1,16 @@
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router';
 import ThemeToggle from './components/ThemeToggle.vue';
-import SearchBar from './components/SearchBar.vue';
-import TodoList from './components/TodoList.vue';
-import AddTodoModal from './components/AddTodoModal.vue';
-import { loadTasks, saveTasks, saveTheme } from './utils/storage.js';
+import { useUserStore } from './stores/user.js';
+import { saveTheme } from './utils/theme.js';
 
-const SEARCH_ANNOUNCE_DELAY = 700;
+const users = useUserStore();
+const route = useRoute();
+const router = useRouter();
 
-const tasks = ref(loadTasks());
-let nextId = tasks.value.reduce((max, t) => Math.max(max, t.id), 0) + 1;
-
-const query = ref('');
 const dark = ref(document.documentElement.getAttribute('data-theme') === 'dark');
-const modalOpen = ref(false);
-const editingId = ref(null);
-const liveMessage = ref('');
-const addButton = ref(null);
-
-// невыполненные сверху, выполненные внизу
-const orderedTasks = computed(() => [
-  ...tasks.value.filter((t) => !t.done),
-  ...tasks.value.filter((t) => t.done),
-]);
-
-const visibleTasks = computed(() => {
-  const q = query.value.trim().toLowerCase();
-  return q ? orderedTasks.value.filter((t) => t.title.toLowerCase().includes(q)) : orderedTasks.value;
-});
-
-const editingTask = computed(() => tasks.value.find((t) => t.id === editingId.value) ?? null);
-
-// Побочный эффект: любое изменение списка (в том числе вложенных полей) сохраняется в localStorage
-watch(tasks, (value) => saveTasks(value), { deep: true });
+const main = ref(null);
 
 // Побочный эффект: смена темы применяется к <html> и запоминается
 watch(dark, (value) => {
@@ -41,104 +19,51 @@ watch(dark, (value) => {
   saveTheme(value);
 });
 
-// Побочный эффект: озвучиваем число найденных задач с задержкой, чтобы не засыпать скринридер
-let searchTimer = null;
-let lastAnnouncedCount = null;
-watch(query, () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => {
-    if (!query.value.trim()) {
-      lastAnnouncedCount = null;
-      return;
-    }
-    const count = visibleTasks.value.length;
-    if (count !== lastAnnouncedCount) {
-      lastAnnouncedCount = count;
-      announce(`Найдено задач: ${count}`);
-    }
-  }, SEARCH_ANNOUNCE_DELAY);
+// При переходе между страницами переводим фокус на содержимое: клавиатурный пользователь
+// и скринридер не остаются на ссылке меню предыдущей страницы
+watch(() => route.name, async (_, previous) => {
+  if (!previous) return;
+  await nextTick();
+  main.value?.focus();
 });
 
-function announce(message) {
-  liveMessage.value = '';
-  setTimeout(() => { liveMessage.value = message; }, 50);
-}
-
-function focusById(id) {
-  const el = document.getElementById(id);
-  if (!el) return false;
-  el.focus();
-  return true;
-}
-
-function openModal(id = null) {
-  editingId.value = id;
-  modalOpen.value = true;
-}
-
-function saveTask(title) {
-  if (editingTask.value) {
-    editingTask.value.title = title;
-    announce('Задача изменена');
-  } else {
-    tasks.value.push({ id: nextId++, title, done: false });
-    announce('Задача добавлена');
-  }
-}
-
-// Возвращаем фокус на кнопку-инициатор (в том числе при закрытии по Esc)
-async function onModalClose() {
-  const id = editingId.value;
-  modalOpen.value = false;
-  editingId.value = null;
-  await nextTick();
-  if (id === null || !focusById(`task-${id}-edit`)) addButton.value.focus();
-}
-
-async function toggleTask(id) {
-  const task = tasks.value.find((t) => t.id === id);
-  if (!task) return;
-  task.done = !task.done;
-  await nextTick();
-  focusById(`task-${id}-done`);
-}
-
-async function deleteTask(id) {
-  const list = visibleTasks.value;
-  const index = list.findIndex((t) => t.id === id);
-  const neighbour = list[index + 1] ?? list[index - 1] ?? null;
-
-  tasks.value = tasks.value.filter((t) => t.id !== id);
-  announce('Задача удалена');
-
-  await nextTick();
-  if (!neighbour || !focusById(`task-${neighbour.id}-done`)) addButton.value.focus();
+function logout() {
+  users.logout();
+  router.push({ name: 'login' });
 }
 </script>
 
 <template>
+  <a class="skip-link" href="#main" @click.prevent="main.focus()">К содержимому</a>
+
   <header class="header">
     <div class="container header__inner">
-      <h1 class="header__title">Задачи</h1>
-      <ThemeToggle :dark="dark" @toggle="dark = !dark" />
+      <RouterLink class="header__brand" :to="{ name: 'todo' }">To-Do</RouterLink>
+
+      <nav class="nav" aria-label="Основная навигация">
+        <ul class="nav__list">
+          <li v-if="users.isAuthenticated"><RouterLink class="nav__link" :to="{ name: 'todo' }">Задачи</RouterLink></li>
+          <li><RouterLink class="nav__link" :to="{ name: 'about' }">О приложении</RouterLink></li>
+          <template v-if="!users.isAuthenticated">
+            <li><RouterLink class="nav__link" :to="{ name: 'login' }">Вход</RouterLink></li>
+            <li><RouterLink class="nav__link" :to="{ name: 'register' }">Регистрация</RouterLink></li>
+          </template>
+        </ul>
+      </nav>
+
+      <div class="header__actions">
+        <template v-if="users.isAuthenticated">
+          <span class="header__user" :title="users.currentUser.email">{{ users.currentUser.email }}</span>
+          <button type="button" class="button button--ghost button--compact" @click="logout">Выйти</button>
+        </template>
+        <ThemeToggle :dark="dark" @toggle="dark = !dark" />
+      </div>
     </div>
   </header>
 
-  <main class="main">
+  <main id="main" ref="main" class="main" tabindex="-1">
     <div class="container">
-      <div class="toolbar">
-        <SearchBar v-model="query" />
-        <button ref="addButton" type="button" class="button button--primary toolbar__add" @click="openModal()">
-          Добавить задачу
-        </button>
-      </div>
-
-      <TodoList :tasks="visibleTasks" :total="tasks.length" @toggle="toggleTask" @edit="openModal"
-        @delete="deleteTask" />
+      <RouterView />
     </div>
   </main>
-
-  <div class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ liveMessage }}</div>
-
-  <AddTodoModal :open="modalOpen" :task="editingTask" @save="saveTask" @close="onModalClose" />
 </template>
