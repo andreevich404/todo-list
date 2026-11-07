@@ -25,10 +25,24 @@ const history = [
   {
     tag: 'Лаба 7',
     text: 'Pinia, Vue Router и учебная авторизация: у каждого пользователя свой список.'
+  },
+  {
+    tag: 'Лаба 9',
+    text: 'Перенос приложения на TypeScript, настройка ESLint и Prettier, проверка типов и качества кода перед сборкой.'
   }
 ]
 
-const stack = ['Vue 3', 'Vite', 'Pinia', 'Vue Router', 'Sass', 'Vitest']
+const stack = [
+  'Vue 3',
+  'TypeScript',
+  'Vite',
+  'Pinia',
+  'Vue Router',
+  'Sass',
+  'ESLint',
+  'Prettier',
+  'Vitest'
+]
 </script>
 
 <template>
