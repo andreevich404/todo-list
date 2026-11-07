@@ -1,7 +1,7 @@
 {
   "name": "todo-list",
   "version": "1.0.0",
-  "description": "To-Do на Vue 3 и TypeScript: Pinia, Vue Router, ESLint и Prettier (лабораторная №9)",
+  "description": "To-Do: независимые правила, сценарии, репозитории, даты, приоритеты и метки (лабораторная №10)",
   "private": true,
   "scripts": {
     "dev": "vite",

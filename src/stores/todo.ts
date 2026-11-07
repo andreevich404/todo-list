@@ -1,75 +1,71 @@
 import { defineStore } from 'pinia'
-import type { Todo, TodoState } from '../types/todo'
-import { cleanTodos } from '../utils/validation'
+import { inject, ref, watch } from 'vue'
+import type { InjectionKey } from 'vue'
+import type { Todo, TodoDraft } from '../domain/todo'
+import type { TodoService } from '../application/todoService'
+import { useUserStore } from './user'
 
-export const useTodoStore = defineStore('todo', {
-  state: (): TodoState => ({
-    // { id, userId, title, done }
-    tasks: [],
-    // счётчик не уменьшается, поэтому id не переиспользуются
-    nextId: 1
-  }),
+export const todoServiceKey: InjectionKey<TodoService> = Symbol('todoService')
 
-  getters: {
-    // задачи пользователя: невыполненные сверху, выполненные внизу
-    forUser:
-      (state) =>
-      (userId: string | null): Todo[] => {
-        const own = state.tasks.filter((t) => t.userId === userId)
-        return [...own.filter((t) => !t.done), ...own.filter((t) => t.done)]
-      }
-  },
+function useTodoService(): TodoService {
+  const service = inject(todoServiceKey)
+  if (!service) throw new Error('Сервис задач не подключён')
+  return service
+}
 
-  actions: {
-    add(userId: string | null, title: string): Todo | null {
-      const value = title.trim()
-      if (!userId || !value) return null
-      const task = { id: this.nextId++, userId, title: value, done: false }
-      this.tasks.push(task)
-      return task
-    },
+export const useTodoStore = defineStore('todo', () => {
+  const service = useTodoService()
+  const users = useUserStore()
+  const tasks = ref<Todo[]>([])
+  const error = ref('')
 
-    // находит задачу только среди задач владельца
-    findOwn(id: number, userId: string | null): Todo | null {
-      return this.tasks.find((t) => t.id === id && t.userId === userId) ?? null
-    },
-
-    rename(id: number, userId: string | null, title: string): boolean {
-      const task = this.findOwn(id, userId)
-      const value = title.trim()
-      if (!task || !value) return false
-      task.title = value
-      return true
-    },
-
-    toggle(id: number, userId: string | null): boolean {
-      const task = this.findOwn(id, userId)
-      if (!task) return false
-      task.done = !task.done
-      return true
-    },
-
-    remove(id: number, userId: string | null): boolean {
-      if (!this.findOwn(id, userId)) return false
-      this.tasks = this.tasks.filter((t) => t.id !== id)
-      return true
-    },
-
-    // Хранилище доступно пользователю и может быть повреждено — чиним после восстановления
-    sanitize() {
-      const clean = cleanTodos(this.tasks)
-      this.tasks = clean
-      const maxId = clean.reduce((max, t) => Math.max(max, t.id), 0)
-      this.nextId =
-        Number.isSafeInteger(this.nextId) && this.nextId > maxId
-          ? this.nextId
-          : maxId + 1
-    }
-  },
-
-  persist: {
-    key: 'todo.store',
-    pick: ['tasks', 'nextId'],
-    afterHydrate: (ctx) => ctx.store.sanitize()
+  function currentUserId(): string {
+    const id = users.currentUser?.id
+    if (!id) throw new Error('Необходимо войти в аккаунт')
+    return id
   }
+
+  function reload() {
+    error.value = ''
+    tasks.value = users.currentUser ? service.load(users.currentUser.id) : []
+  }
+
+  watch(
+    () => users.currentUser?.id,
+    () => {
+      tasks.value = []
+      try {
+        reload()
+      } catch {
+        error.value =
+          'Не удалось загрузить задачи. Проверьте доступ к хранилищу браузера.'
+      }
+    },
+    { immediate: true }
+  )
+
+  function create(input: TodoDraft) {
+    service.create(currentUserId(), input)
+    reload()
+  }
+
+  function update(id: number, input: TodoDraft) {
+    if (!service.update(currentUserId(), id, input))
+      throw new Error('Задача не найдена. Обновите список.')
+    reload()
+  }
+
+  function toggle(id: number) {
+    if (!service.toggle(currentUserId(), id))
+      throw new Error('Задача не найдена. Обновите список.')
+    reload()
+  }
+
+  function remove(id: number) {
+    if (!service.remove(currentUserId(), id))
+      throw new Error('Задача не найдена. Обновите список.')
+    reload()
+  }
+
+  return { tasks, error, reload, create, update, toggle, remove }
 })

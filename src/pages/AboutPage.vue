@@ -9,8 +9,8 @@ const users = useUserStore()
 // Живая статистика прямо из сторов: меняется вместе с данными
 const stats = computed(() => [
   { value: users.users.length, label: 'аккаунтов в этом браузере' },
-  { value: todos.tasks.length, label: 'задач создано' },
-  { value: todos.tasks.filter((t) => t.done).length, label: 'задач выполнено' }
+  { value: todos.tasks.length, label: 'ваших задач' },
+  { value: todos.tasks.filter((t) => t.done).length, label: 'выполнено вами' }
 ])
 
 const history = [
@@ -29,6 +29,10 @@ const history = [
   {
     tag: 'Лаба 9',
     text: 'Перенос приложения на TypeScript, настройка ESLint и Prettier, проверка типов и качества кода перед сборкой.'
+  },
+  {
+    tag: 'Лаба 10',
+    text: 'Разделение правил, сценариев и хранения задач. Даты начала и дедлайна, приоритеты, метки и пять представлений списка.'
   }
 ]
 

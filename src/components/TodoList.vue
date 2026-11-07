@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TodoItem from './TodoItem.vue'
 
-import type { Todo } from '../types/todo'
+import type { Todo } from '../domain/todo'
 
 defineProps<{ tasks: Todo[]; total: number }>()
 defineEmits<{
@@ -33,8 +33,10 @@ defineEmits<{
           </p>
         </template>
         <template v-else>
-          <p class="empty-state__title">Ничего не найдено</p>
-          <p class="empty-state__text">Попробуйте изменить поисковый запрос.</p>
+          <p class="empty-state__title">В этом представлении задач нет</p>
+          <p class="empty-state__text">
+            Выберите другую вкладку или измените фильтры.
+          </p>
         </template>
       </div>
     </div>

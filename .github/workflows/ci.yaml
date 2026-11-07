@@ -2,7 +2,7 @@ name: Build and publish To-Do
 
 on:
   push:
-    branches: [main, lab-6, lab-7, lab-9]
+    branches: [main, lab-6, lab-7, lab-9, lab-10]
   pull_request:
     branches: [main]
   workflow_dispatch:

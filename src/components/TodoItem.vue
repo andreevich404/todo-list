@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick } from 'vue'
 
-import type { Todo } from '../types/todo'
+import type { Todo } from '../domain/todo'
+import { priorityLabels, formatTaskDate } from '../utils/todoPresentation'
 
 const props = defineProps<{ task: Todo }>()
-defineEmits<{
+const emit = defineEmits<{
   toggle: [id: number]
   edit: [id: number]
   delete: [id: number]
 }>()
 
 const prefix = computed(() => `task-${props.task.id}`)
+async function onToggle(event: Event) {
+  if (!(event.target instanceof HTMLInputElement)) return
+  const input = event.target
+  emit('toggle', props.task.id)
+  await nextTick()
+  // При отказе записи оставляем фактический статус, а не новое состояние DOM.
+  input.checked = props.task.done
+}
 </script>
 
 <template>
@@ -21,7 +30,7 @@ const prefix = computed(() => `task-${props.task.id}`)
         class="task__input"
         type="checkbox"
         :checked="task.done"
-        @change="$emit('toggle', task.id)"
+        @change="onToggle"
       />
       <span class="task__box" aria-hidden="true">
         <svg
@@ -41,12 +50,34 @@ const prefix = computed(() => `task-${props.task.id}`)
         </svg>
       </span>
     </span>
-    <label
-      :id="`${prefix}-title`"
-      class="task__title"
-      :for="`${prefix}-done`"
-      >{{ task.title }}</label
-    >
+    <div class="task__content">
+      <label
+        :id="`${prefix}-title`"
+        class="task__title"
+        :for="`${prefix}-done`"
+        >{{ task.title }}</label
+      >
+      <div class="task__meta">
+        <span class="task__priority" :data-priority="task.priority"
+          >{{ priorityLabels[task.priority] }} приоритет</span
+        >
+        <span v-if="task.startDate"
+          >Начало:
+          <time :datetime="task.startDate">{{
+            formatTaskDate(task.startDate)
+          }}</time></span
+        >
+        <span v-if="task.dueDate"
+          >Дедлайн:
+          <time :datetime="task.dueDate">{{
+            formatTaskDate(task.dueDate)
+          }}</time></span
+        >
+        <span v-for="tag in task.tags" :key="tag" class="task__tag"
+          >#{{ tag }}</span
+        >
+      </div>
+    </div>
     <div class="task__actions">
       <button
         :id="`${prefix}-edit`"

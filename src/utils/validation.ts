@@ -1,4 +1,3 @@
-import type { Todo } from '../types/todo'
 import type { User } from '../types/user'
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
@@ -28,31 +27,4 @@ export function cleanUsers(value: unknown): User[] {
     users.push({ id, email, salt, iterations, passwordHash })
   }
   return users
-}
-
-export function cleanTodos(value: unknown): Todo[] {
-  if (!Array.isArray(value)) return []
-  const seen = new Set<number>()
-  const tasks: Todo[] = []
-  for (const item of value) {
-    if (!isRecord(item)) continue
-    const { id, userId, title, done } = item
-    if (
-      typeof id !== 'number' ||
-      !Number.isSafeInteger(id) ||
-      id < 1 ||
-      seen.has(id)
-    )
-      continue
-    if (
-      typeof userId !== 'string' ||
-      !userId ||
-      typeof title !== 'string' ||
-      !title.trim()
-    )
-      continue
-    seen.add(id)
-    tasks.push({ id, userId, title: title.trim(), done: done === true })
-  }
-  return tasks
 }
