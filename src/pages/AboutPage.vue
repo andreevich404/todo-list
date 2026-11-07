@@ -1,25 +1,34 @@
-<script setup>
-import { computed } from 'vue';
-import { useTodoStore } from '../stores/todo.js';
-import { useUserStore } from '../stores/user.js';
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useTodoStore } from '../stores/todo'
+import { useUserStore } from '../stores/user'
 
-const todos = useTodoStore();
-const users = useUserStore();
+const todos = useTodoStore()
+const users = useUserStore()
 
 // Живая статистика прямо из сторов: меняется вместе с данными
 const stats = computed(() => [
   { value: users.users.length, label: 'аккаунтов в этом браузере' },
   { value: todos.tasks.length, label: 'задач создано' },
-  { value: todos.tasks.filter((t) => t.done).length, label: 'задач выполнено' },
-]);
+  { value: todos.tasks.filter((t) => t.done).length, label: 'задач выполнено' }
+])
 
 const history = [
-  { tag: 'Лаба 4', text: 'Статичная страница на Sass и vanilla JS: нативный <dialog>, две темы, доступность A1–A7.' },
-  { tag: 'Лаба 6', text: 'Переезд на Vue 3 и Vite: компоненты, props и emit, публикация на GitHub Pages.' },
-  { tag: 'Лаба 7', text: 'Pinia, Vue Router и учебная авторизация: у каждого пользователя свой список.' },
-];
+  {
+    tag: 'Лаба 4',
+    text: 'Статичная страница на Sass и vanilla JS: нативный <dialog>, две темы, доступность A1–A7.'
+  },
+  {
+    tag: 'Лаба 6',
+    text: 'Переезд на Vue 3 и Vite: компоненты, props и emit, публикация на GitHub Pages.'
+  },
+  {
+    tag: 'Лаба 7',
+    text: 'Pinia, Vue Router и учебная авторизация: у каждого пользователя свой список.'
+  }
+]
 
-const stack = ['Vue 3', 'Vite', 'Pinia', 'Vue Router', 'Sass', 'Vitest'];
+const stack = ['Vue 3', 'Vite', 'Pinia', 'Vue Router', 'Sass', 'Vitest']
 </script>
 
 <template>
@@ -28,8 +37,9 @@ const stack = ['Vue 3', 'Vite', 'Pinia', 'Vue Router', 'Sass', 'Vitest'];
   <section class="card about about__hero" aria-labelledby="about-what">
     <h2 id="about-what" class="about__heading">Что это</h2>
     <p>
-      To-Do List, который вырос из одной HTML-страницы в небольшое приложение: задачи, поиск, тёмная тема,
-      личные списки и вход. Всё работает в браузере и хранится в <code>localStorage</code>.
+      To-Do List, который вырос из одной HTML-страницы в небольшое приложение:
+      задачи, поиск, тёмная тема, личные списки и вход. Всё работает в браузере
+      и хранится в <code>localStorage</code>.
     </p>
   </section>
 
@@ -63,9 +73,10 @@ const stack = ['Vue 3', 'Vite', 'Pinia', 'Vue Router', 'Sass', 'Vitest'];
   <section class="card about about__note" aria-labelledby="about-note">
     <h2 id="about-note" class="about__heading">Честное предупреждение</h2>
     <p>
-      Вход здесь — учебный макет. Сервера нет, аккаунты лежат в вашем браузере, а любой, кто откроет DevTools,
-      увидит их данные. Настоящая авторизация проверяет пароль на сервере. Поэтому вводите только
-      вымышленные адреса и пароли, которые нигде больше не используете.
+      Вход здесь — учебный макет. Сервера нет, аккаунты лежат в вашем браузере,
+      а любой, кто откроет DevTools, увидит их данные. Настоящая авторизация
+      проверяет пароль на сервере. Поэтому вводите только вымышленные адреса и
+      пароли, которые нигде больше не используете.
     </p>
   </section>
 </template>

@@ -1,13 +1,14 @@
-<script setup>
-import TodoItem from './TodoItem.vue';
+<script setup lang="ts">
+import TodoItem from './TodoItem.vue'
 
-defineProps({
-  // задачи, уже отфильтрованные и упорядоченные родителем
-  tasks: { type: Array, required: true },
-  // всего задач без учёта поиска — отличает «пусто» от «ничего не найдено»
-  total: { type: Number, required: true },
-});
-defineEmits(['toggle', 'edit', 'delete']);
+import type { Todo } from '../types/todo'
+
+defineProps<{ tasks: Todo[]; total: number }>()
+defineEmits<{
+  toggle: [id: number]
+  edit: [id: number]
+  delete: [id: number]
+}>()
 </script>
 
 <template>
@@ -15,13 +16,21 @@ defineEmits(['toggle', 'edit', 'delete']);
     <h2 id="tasks-title" class="tasks__title">Список</h2>
     <div class="tasks__card">
       <ul v-if="tasks.length" class="task-list" aria-labelledby="tasks-title">
-        <TodoItem v-for="task in tasks" :key="task.id" :task="task" @toggle="$emit('toggle', $event)"
-          @edit="$emit('edit', $event)" @delete="$emit('delete', $event)" />
+        <TodoItem
+          v-for="task in tasks"
+          :key="task.id"
+          :task="task"
+          @toggle="$emit('toggle', $event)"
+          @edit="$emit('edit', $event)"
+          @delete="$emit('delete', $event)"
+        />
       </ul>
       <div v-else class="empty-state">
         <template v-if="total === 0">
           <p class="empty-state__title">Задач пока нет</p>
-          <p class="empty-state__text">Нажмите «Добавить задачу», чтобы создать первую.</p>
+          <p class="empty-state__text">
+            Нажмите «Добавить задачу», чтобы создать первую.
+          </p>
         </template>
         <template v-else>
           <p class="empty-state__title">Ничего не найдено</p>
